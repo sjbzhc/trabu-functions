@@ -13,8 +13,9 @@ import {Stripe} from "stripe";
 // import * as functions from "firebase-functions";
 import * as express from "express";
 import {Timestamp} from "firebase-admin/firestore";
-import {initializeApp} from "firebase-admin/app";
-import * as admin from "firebase-admin";
+import {db} from "./services/firebase";
+// import {initializeApp} from "firebase-admin/app";
+
 
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
@@ -114,9 +115,23 @@ app.post("/updateAccount",
       },
     });
 
+    // db.collection("StripeAccount");
     res.send({account});
   }
 );
+
+app.post("/test", async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  try {
+    const usr = await db
+      .collection("users").doc("COP1tAW8xVYD8KTM5ylaXPFObn72").get();
+    console.log("usr", usr);
+  } catch (e) {
+    console.log("ERROR: ", e);
+  }
+  res.send({docSnap: "Some snap"});
+});
 
 // This links the companion account. Returns the link for completing onboarding
 app.post("/linkCompanionAccount",
