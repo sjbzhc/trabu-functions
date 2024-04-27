@@ -13,8 +13,7 @@ import {Stripe} from "stripe";
 // import * as functions from "firebase-functions";
 import * as express from "express";
 import {Timestamp} from "firebase-admin/firestore";
-import {db} from "./services/firebase";
-// import {initializeApp} from "firebase-admin/app";
+import {admin, db} from "./services/firebase";
 
 
 // Start writing functions
@@ -35,6 +34,8 @@ const app = express();
 // admin.initializeApp({
 //   credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
 // });
+
+// app.use(cors());
 
 
 // This creates the companion account
@@ -121,16 +122,24 @@ app.post("/updateAccount",
 );
 
 app.post("/test", async (req, res) => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
+  let idToken = "";
+
+  if ( req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer ")) {
+    idToken = req.headers.authorization.split(" ")[1];
+  }
+
   try {
     const usr = await db
-      .collection("users").doc("COP1tAW8xVYD8KTM5ylaXPFObn72").get();
-    console.log("usr", usr);
+      .collection("users").doc("test1").get();
+    console.log("usr ID", usr);
+
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    console.log("Decoded token: ", decodedToken);
   } catch (e) {
     console.log("ERROR: ", e);
   }
-  res.send({docSnap: "Some snap"});
+  res.send({data: "Some snap"});
 });
 
 // This links the companion account. Returns the link for completing onboarding
